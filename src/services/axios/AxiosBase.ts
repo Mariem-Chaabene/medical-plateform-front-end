@@ -1,27 +1,37 @@
 import axios from 'axios'
-import AxiosResponseIntrceptorErrorCallback from './AxiosResponseIntrceptorErrorCallback'
-import AxiosRequestIntrceptorConfigCallback from './AxiosRequestIntrceptorConfigCallback'
-import appConfig from '@/configs/app.config'
-import type { AxiosError } from 'axios'
+// import AxiosResponseIntrceptorErrorCallback from './AxiosResponseIntrceptorErrorCallback'
+// import AxiosRequestIntrceptorConfigCallback from './AxiosRequestIntrceptorConfigCallback'
+import endpointConfig from '@/configs/endpoint.config'
+// import type { AxiosError } from 'axios'
 
 const AxiosBase = axios.create({
+    baseURL: endpointConfig.baseURL || 'http://127.0.0.1:8000/api', // <- ton backend Laravel
     timeout: 60000,
-    baseURL: appConfig.apiPrefix,
+    headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+    },
 })
 
 AxiosBase.interceptors.request.use(
     (config) => {
-        return AxiosRequestIntrceptorConfigCallback(config)
+        const token = localStorage.getItem('token')
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
     },
-    (error) => {
-        return Promise.reject(error)
-    },
+    (error) => Promise.reject(error),
 )
 
 AxiosBase.interceptors.response.use(
     (response) => response,
-    (error: AxiosError) => {
-        AxiosResponseIntrceptorErrorCallback(error)
+    (error) => {
+        if (error.response?.status === 401) {
+            // Token invalide ou expiré -> on peut rediriger vers /login
+            localStorage.removeItem('token')
+            window.location.href = '/login'
+        }
         return Promise.reject(error)
     },
 )

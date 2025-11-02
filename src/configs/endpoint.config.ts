@@ -1,11 +1,15 @@
 export const apiPrefix = '/api'
 
 const endpointConfig = {
-    signIn: '/sign-in',
-    signOut: '/sign-out',
-    signUp: '/sign-up',
-    forgotPassword: '/forgot-password',
-    resetPassword: '/reset-password',
+    baseURL: 'http://127.0.0.1:8000/api', 
+    signIn: '/login',
+    signOut: '/logout',
+    signUp: '/register',
+    //signUp: '/sign-up',
+    //signIn: '/sign-in',
+    //signOut: '/sign-out',
+    // forgotPassword: '/forgot-password',
+    // resetPassword: '/reset-password',
 }
 
 export default endpointConfig
